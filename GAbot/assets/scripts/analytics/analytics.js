@@ -16,7 +16,9 @@ var analytics = cc.Class({
         },
 
         gameKey: cc.EditBox,
-        secretKey: cc.EditBox
+        secretKey: cc.EditBox,
+        login: cc.Node,
+        bot: cc.Node,
 
     },
 
@@ -28,7 +30,7 @@ var analytics = cc.Class({
 
     start () {
         // Init on start (make sure you have internet connection)
-        this.Init_Analytics();
+        //this.Init_Analytics();
     },
 
     Init_Analytics(){// Force it if you're sure that you need
@@ -45,15 +47,16 @@ var analytics = cc.Class({
                 ga.GameAnalytics.setEnabledEventSubmission(false);
             }
 
-            ga.GameAnalytics.configureBuild("0.5.0");
-            ga.GameAnalytics.initialize("63d0bf37a3c7e7bbb8ece69373eabb43", "3f919b525355ccba0faabc45f7cd0108908abe1f");
+            ga.GameAnalytics.configureBuild("0.1.0");
+            ga.GameAnalytics.initialize(this.gameKey.string, this.secretKey.string);
 
             this.Analytics_Initialized = true;
+            this.login.active = false;
+            this.bot.active = true;
             cc.log("Analytics is on");
         }
 
         window.analytics = this;
-
     },
 
     // GameAnalytics SDK initialized and ready
@@ -66,7 +69,8 @@ var analytics = cc.Class({
     },
 
     End_Analytics_Session(){
-        ga.GameAnalytics.endSessionImmediate(); // End session on game end or went to background
+        ga.GameAnalytics.endSession(); // End session on game end or went to background
+        this.Analytics_Initialized = false;
     },
 
     Get_User_ID(){
@@ -75,43 +79,22 @@ var analytics = cc.Class({
 
     // Sample Game Events
 
-    Level_Start(event_detail,scene_name){
-
-        scene_name = scene_name || cc.director.getScene().name;
-
+    Level_Start(world="World", stage="Stage", level="Level", score=0){
         if(this.Analytics_Ready()){
-            ga.GameAnalytics.addProgressionEvent( ga.EGAProgressionStatus.Start, scene_name , event_detail );
+            ga.GameAnalytics.addProgressionEvent( ga.EGAProgressionStatus.Start, world, stage, level, score);
         }
         
     },
 
-
-    // Sample Game Events
-    Level_Start(event_detail,scene_name){
-
-        scene_name = scene_name || cc.director.getScene().name;
-
+    Level_Fail(world="World", stage="Stage", level="Level", score=0){
         if(this.Analytics_Ready()){
-            ga.GameAnalytics.addProgressionEvent( ga.EGAProgressionStatus.Start, scene_name , event_detail );
-        }
-        
-    },
-
-    Level_Fail(event_detail,scene_name){
-
-        scene_name = scene_name || cc.director.getScene().name;
-
-        if(this.Analytics_Ready()){
-            ga.GameAnalytics.addProgressionEvent( ga.EGAProgressionStatus.Fail, scene_name , event_detail);
+            ga.GameAnalytics.addProgressionEvent( ga.EGAProgressionStatus.Fail, world, stage, level, score);
         }
     },
 
-    Level_Complete(event_detail,scene_name){
-
-        scene_name = scene_name || cc.director.getScene().name;
-
+    Level_Complete(world="World", stage="Stage", level="Level", score=0){
         if(this.Analytics_Ready()){
-            ga.GameAnalytics.addProgressionEvent( ga.EGAProgressionStatus.Complete, scene_name , event_detail);
+            ga.GameAnalytics.addProgressionEvent( ga.EGAProgressionStatus.Complete, world, stage, level, score);
         }
     },
 
